@@ -19,7 +19,7 @@ public class UserModel {
 
   private String email;
 
-  private Integer currency = 0;
+  private double currency = 0.0;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "JOB_ID", nullable = false)
@@ -49,12 +49,12 @@ public class UserModel {
     this.email = email;
   }
 
-  public Integer getCurrency() {
+  public double getCurrency() {
     return currency;
   }
 
-  public void setCurrency(Integer currency) {
-    Integer newCurrency = Math.max(0, currency);
+  public void setCurrency(double currency) {
+    double newCurrency = Math.max((double) 0, currency);
     this.currency = newCurrency;
   }
 

@@ -114,7 +114,17 @@ public class UserController {
     }
 
     UserModel user = userSearched.get();
-    user.setCurrency((int) data.get("money"));
+    double dMoney = 0.0;
+
+    if (data.get("money") instanceof Integer) {
+      dMoney = (double) ((Integer) data.get("money"));
+    } else if (data.get("money") instanceof Double) {
+      dMoney = (double) data.get("money");
+    } else {
+      dMoney = Double.valueOf((String) data.get("money"));
+    }
+
+    user.setCurrency(dMoney);
     UserModel newUserData = userRepository.save(user);
 
     response.put("data", newUserData);
