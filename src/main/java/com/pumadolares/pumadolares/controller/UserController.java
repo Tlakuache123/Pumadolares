@@ -16,22 +16,29 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.pumadolares.pumadolares.model.UserModel;
 import com.pumadolares.pumadolares.repository.UserRepository;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @CrossOrigin
-@RequestMapping(path = "user")
+@RequestMapping(path = "/api/user")
 public class UserController {
   @Autowired
   public UserRepository userRepository;
 
-  @PostMapping(path = "add")
+  @Operation(summary = "Inserta un nuevo usuario", description = "Agrega un nuevo usuario a la base de datos")
+  @PostMapping(path = "/")
+  @ResponseBody
   public ResponseEntity<Map<String, Object>> add(@RequestBody Map<String, Object> data) {
     Map<String, Object> response = new HashMap<>();
 
@@ -50,7 +57,8 @@ public class UserController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
-  @GetMapping(path = "get")
+  @Operation(summary = "Obtener todos los usuarios", description = "Obtienes la informacion resumida de todos los usuarios guardados")
+  @GetMapping(path = "/")
   public @ResponseBody Map<String, Object> getAll() {
     Iterator<UserModel> allUsers = userRepository.findAll().iterator();
 
@@ -72,7 +80,9 @@ public class UserController {
     return response;
   }
 
-  @GetMapping(path = "get/{id}")
+  @Operation(summary = "Obten un usuario por su id", description = "Obten toda la informacion de un usario especificado por su id")
+  @GetMapping(path = "/{id}")
+  @ResponseBody
   public ResponseEntity<Map<String, Object>> getUser(@PathVariable("id") Integer id) {
     Optional<UserModel> userSearched = userRepository.findById(id);
     Map<String, Object> response = new HashMap<>();
@@ -95,7 +105,9 @@ public class UserController {
 
   }
 
+  @Operation(summary = "Modifica el dinero de un usario", description = "Suma o resta dinero a la cuenta de un usuario")
   @PutMapping(path = "money/{id}")
+  @ResponseBody
   public ResponseEntity<Map<String, Object>> modifyMoney(@PathVariable("id") Integer id,
       @RequestBody Map<String, Object> data) {
     Optional<UserModel> userSearched = userRepository.findById(id);
@@ -133,7 +145,8 @@ public class UserController {
 
   }
 
-  @DeleteMapping(path = "delete/{id}")
+  @Operation(summary = "Elimina un usuario por su id", description = "Elimina a un usuario de la base de datos por medio de su id")
+  @DeleteMapping(path = "/{id}")
   public @ResponseBody String deleteUser(@PathVariable("id") int id) {
     userRepository.deleteById(id);
     return "Usuario eliminado";
