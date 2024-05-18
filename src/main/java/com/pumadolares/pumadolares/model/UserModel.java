@@ -54,6 +54,7 @@ public class UserModel {
   }
 
   public void setCurrency(double currency) {
+    // Prevenir numeros negativos
     double newCurrency = Math.max((double) 0, currency);
     this.currency = newCurrency;
   }

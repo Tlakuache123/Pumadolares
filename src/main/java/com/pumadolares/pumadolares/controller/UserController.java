@@ -45,7 +45,7 @@ public class UserController {
   public ResponseEntity<Map<String, Object>> add(@RequestBody Map<String, Object> data) {
     Map<String, Object> response = new HashMap<>();
 
-    if (!data.containsKey("name") && !data.containsKey("email")) {
+    if (!data.containsKey("name") || !data.containsKey("email")) {
       response.put("message", "Falta datos para poder agregar un usuario");
       return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
@@ -131,6 +131,7 @@ public class UserController {
     UserModel user = userSearched.get();
     double dMoney = 0.0;
 
+    // Transformar valor dinero en un numero
     if (data.get("money") instanceof Integer) {
       dMoney = (double) ((Integer) data.get("money"));
     } else if (data.get("money") instanceof Double) {
