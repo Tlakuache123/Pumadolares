@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.pumadolares.pumadolares.model.UserModel;
 import com.pumadolares.pumadolares.repository.UserRepository;
+import com.pumadolares.pumadolares.service.EmailService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.mail.MessagingException;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -35,6 +35,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class UserController {
   @Autowired
   public UserRepository userRepository;
+
+  @Autowired
+  private EmailService emailService;
 
   @Operation(summary = "Inserta un nuevo usuario", description = "Agrega un nuevo usuario a la base de datos")
   @PostMapping(path = "/")
@@ -150,6 +153,36 @@ public class UserController {
   public @ResponseBody String deleteUser(@PathVariable("id") int id) {
     userRepository.deleteById(id);
     return "Usuario eliminado";
+  }
+
+  @PostMapping("notify")
+  public Map<String, String> sendEmail(@RequestBody Map<String, String> body) {
+    Map<String, String> response = new HashMap<>();
+    try {
+      if (!body.containsKey("to") || !body.containsKey("subject") || !body.containsKey("message")) {
+        response.put("message", "datos faltantes para enviar un correo");
+        return response;
+      }
+      String to = body.get("to");
+      String subject = body.get("subject");
+      String message = body.get("message");
+
+      Optional<UserModel> userSearched = userRepository.findById(Integer.parseInt(to));
+
+      if (!userSearched.isPresent()) {
+        response.put("message", "No se encontro un usario al que mandarle correo");
+      }
+
+      UserModel user = userSearched.get();
+
+      emailService.sendEmail(user.getEmail(), subject, message);
+      response.put("message", "correo enviado correctamente");
+      return response;
+    } catch (MessagingException err) {
+      System.err.println(err);
+      response.put("message", "error al enviar correo: " + err.getMessage());
+      return response;
+    }
   }
 
 }
